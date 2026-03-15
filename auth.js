@@ -331,12 +331,21 @@ if (dashboardView.style.display === 'block') {
 
 // ===== הצעות לכלים חדשים =====
 window.submitSuggestionToFirebase = async function(text) {
+    // שימוש באותו נתיב שעובד כמו users
     const suggestionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'suggestions');
-    await addDoc(suggestionsRef, {
+    const newDoc = {
         text: text,
         userId: currentLoggedInUserId || 'anonymous',
         timestamp: serverTimestamp()
-    });
+    };
+    console.log('Saving suggestion to:', suggestionsRef.path, newDoc);
+    try {
+        const result = await addDoc(suggestionsRef, newDoc);
+        console.log('Suggestion saved, id:', result.id);
+    } catch(e) {
+        console.error('Firestore error:', e.code, e.message, e);
+        throw e;
+    }
 };
 
 window.loadSuggestions = async function() {

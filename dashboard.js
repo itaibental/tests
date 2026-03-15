@@ -250,7 +250,8 @@ window.submitSuggestion = async function() {
         document.getElementById('suggestThanks').style.display = 'block';
         setTimeout(() => window.closeSuggestModal(), 3000);
     } catch(e) {
-        alert('שגיאה בשליחה. נסה שוב.');
+        console.error('Submit error:', e);
+        alert('שגיאה: ' + (e.message || e.code || JSON.stringify(e)));
         btn.disabled = false;
         btn.innerText = 'שלח הצעה';
     }
