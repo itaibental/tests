@@ -318,7 +318,7 @@ submitBtn.addEventListener('click', () => {
 
 adminBtn.addEventListener('click', () => {
     const code = document.getElementById('adminCode').value;
-    if (code === '1234') {
+    if (code === 'ibt1234') {
         showAdminPanel();
     } else {
         alert("קוד שגוי");
