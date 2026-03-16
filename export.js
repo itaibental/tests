@@ -1,5 +1,5 @@
 // ===== export.js =====
-// ייצוא נתונים ל-CSV
+// ייצוא נתונים ל-CSV - מעודכן לגרסה החדשה
 
 function formatDate(timestamp) {
   if (!timestamp) return 'תאריך לא ידוע';

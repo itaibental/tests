@@ -1,5 +1,5 @@
 // ===== ui-soldiers.js =====
-// טאב ניהול חיילים
+// טאב ניהול חיילים - מעודכן לגרסה החדשה
 
 function renderSoldiersTab() {
   const { soldiersData, isSavingSoldiers, soldierSaveMessage, newSoldier } = AppState;
@@ -8,28 +8,30 @@ function renderSoldiersTab() {
   <div class="space-y-6">
     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h2 class="text-lg font-bold text-slate-700">ניהול רשימת החיילים</h2>
-        <p class="text-sm text-slate-500">ערוך, הוסף או הסר חיילים מהרשימה. לאחר עריכה לחץ על "שמור שינויים" כדי לסנכרן עם Firebase.</p>
+        <h2 class="text-lg font-bold text-slate-700">ניהול חיילים ומחלקות</h2>
+        <p class="text-sm text-slate-500">הוסף חיילים חדשים, ערוך שמות, מספרים אישיים ושיוך מחלקתי.</p>
       </div>
       <button onclick="handleSaveSoldiers()"
         ${isSavingSoldiers ? 'disabled' : ''}
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-colors disabled:bg-slate-300 w-full sm:w-auto">
-        ${isSavingSoldiers ? 'שומר...' : `שמור שינויים <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>`}
+        ${isSavingSoldiers ? 'שומר...' : `שמור רשימה <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>`}
       </button>
     </div>
 
-    ${soldierSaveMessage ? `<div class="bg-green-100 text-green-700 p-4 rounded-lg font-medium shadow-sm">${escH(soldierSaveMessage)}</div>` : ''}
+    ${soldierSaveMessage ? `<div class="bg-green-100 text-green-700 p-4 rounded-lg font-medium shadow-sm mb-4">${escH(soldierSaveMessage)}</div>` : ''}
 
-    <!-- Add new soldier form -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+    <!-- Add new soldier -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-6">
       <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
-        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+        </svg>
         הוספת חייל חדש
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">שם מלא</label>
-          <input id="new-soldier-name" required placeholder="שם החייל"
+          <input id="new-soldier-name" required placeholder="שם מלא"
             oninput="setState({newSoldier:{...AppState.newSoldier,name:this.value}})"
             class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"/>
         </div>
@@ -85,8 +87,7 @@ function renderSoldiersTab() {
                   class="w-full border-none bg-transparent p-1 outline-none focus:bg-white focus:ring-1 focus:ring-blue-300 rounded font-mono text-sm"/>
               </td>
               <td class="p-2">
-                <input value="${escH(soldier.department || '')}"
-                  placeholder="ללא מחלקה"
+                <input value="${escH(soldier.department || '')}" placeholder="ללא מחלקה"
                   onchange="handleUpdateSoldier(${idx},'department',this.value)"
                   class="w-full border-none bg-transparent p-1 outline-none focus:bg-white focus:ring-1 focus:ring-blue-300 rounded"/>
               </td>
@@ -117,8 +118,7 @@ function submitNewSoldier() {
     newSoldier: { name: '', id: '', department: '', isMaplag: false }
   });
   ['new-soldier-name','new-soldier-id','new-soldier-dept'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   const cb = document.getElementById('new-soldier-maplag');
   if (cb) cb.checked = false;

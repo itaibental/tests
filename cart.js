@@ -1,5 +1,5 @@
 // ===== cart.js =====
-// ניהול עגלת הציוד (cart) ופריטים מסוננים
+// ניהול עגלת הציוד - מעודכן לגרסה החדשה
 
 function handleQuantityChange(itemName, newQuantity) {
   const val = Math.max(0, parseInt(newQuantity) || 0);
@@ -19,7 +19,7 @@ function handleDecrement(itemName) {
   renderApp();
 }
 
-// --- Weapons ---
+// Weapons
 function handleAddWeapon() {
   const { selectedWeaponType, selectedWeaponSerial, cartWeapons } = AppState;
   if (selectedWeaponType && selectedWeaponSerial) {
@@ -31,12 +31,12 @@ function handleAddWeapon() {
   }
 }
 
-function handleRemoveWeapon(index) {
-  setState({ cartWeapons: AppState.cartWeapons.filter((_, i) => i !== index) });
+function handleRemoveWeapon(indexToRemove) {
+  setState({ cartWeapons: AppState.cartWeapons.filter((_, i) => i !== indexToRemove) });
   renderApp();
 }
 
-// --- Optics ---
+// Optics
 function handleAddOptic() {
   const { selectedOpticType, selectedOpticSerial, cartOptics } = AppState;
   if (selectedOpticType && selectedOpticSerial) {
@@ -48,12 +48,12 @@ function handleAddOptic() {
   }
 }
 
-function handleRemoveOptic(index) {
-  setState({ cartOptics: AppState.cartOptics.filter((_, i) => i !== index) });
+function handleRemoveOptic(indexToRemove) {
+  setState({ cartOptics: AppState.cartOptics.filter((_, i) => i !== indexToRemove) });
   renderApp();
 }
 
-// --- Comms ---
+// Comms
 function handleAddComm() {
   const { selectedCommType, selectedCommSerial, cartComms } = AppState;
   if (selectedCommType && selectedCommSerial) {
@@ -65,12 +65,13 @@ function handleAddComm() {
   }
 }
 
-function handleRemoveComm(index) {
-  setState({ cartComms: AppState.cartComms.filter((_, i) => i !== index) });
+function handleRemoveComm(indexToRemove) {
+  setState({ cartComms: AppState.cartComms.filter((_, i) => i !== indexToRemove) });
   renderApp();
 }
 
 function getTotalItemsInCart() {
   const { cart, cartWeapons, cartOptics, cartComms } = AppState;
-  return Object.values(cart).reduce((s, q) => s + q, 0) + cartWeapons.length + cartOptics.length + cartComms.length;
+  return Object.values(cart).reduce((s, q) => s + q, 0) +
+    cartWeapons.length + cartOptics.length + cartComms.length;
 }

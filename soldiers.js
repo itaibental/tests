@@ -1,10 +1,10 @@
 // ===== soldiers.js =====
-// לוגיקה לניהול חיילים ובחירת חייל
+// לוגיקה לניהול חיילים ובחירת חייל - מעודכן לגרסה החדשה
 
 function selectSoldierForForm(soldier) {
   if (!soldier) {
     setState({
-      soldierName: '', personalNumber: '', formSearchTerm: '',
+      soldierName: '', personalNumber: '',
       cart: {}, originalCart: {},
       cartWeapons: [], originalWeapons: [],
       cartOptics: [], originalOptics: [],
@@ -22,15 +22,15 @@ function selectSoldierForForm(soldier) {
     isFormDropdownOpen: false
   });
 
-  // Calculate current possession from history
+  // Calculate current possession from history (same logic as source)
   const soldierHistory = [...AppState.submissionHistory]
     .filter(e => e.soldierName === soldier.name)
     .reverse();
 
   const currentCart = {};
-  const weaponsMap = new Map();
-  const opticsMap = new Map();
-  const commsMap = new Map();
+  const weaponsMap  = new Map();
+  const opticsMap   = new Map();
+  const commsMap    = new Map();
 
   soldierHistory.forEach(entry => {
     if (entry.items) {
@@ -84,11 +84,12 @@ function handleAddSoldier(e) {
       soldiersData: [...AppState.soldiersData, { ...newSoldier }],
       newSoldier: { name: '', id: '', department: '', isMaplag: false }
     });
-    // Reset form inputs
-    document.getElementById('new-soldier-name').value = '';
-    document.getElementById('new-soldier-id').value = '';
-    document.getElementById('new-soldier-dept').value = '';
-    document.getElementById('new-soldier-maplag').checked = false;
+    ['new-soldier-name','new-soldier-id','new-soldier-dept'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const cb = document.getElementById('new-soldier-maplag');
+    if (cb) cb.checked = false;
     renderApp();
   }
 }
@@ -97,6 +98,7 @@ function handleUpdateSoldier(index, field, value) {
   const updated = [...AppState.soldiersData];
   updated[index] = { ...updated[index], [field]: value };
   setState({ soldiersData: updated });
+  // No re-render needed - inline edit
 }
 
 function handleRemoveSoldier(index) {

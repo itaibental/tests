@@ -1,5 +1,5 @@
 // ===== auth.js =====
-// לוגיקת אימות והתחברות
+// לוגיקת אימות - מעודכן לגרסה החדשה
 
 function initAuth() {
   auth.onAuthStateChanged((currentUser) => {
@@ -13,7 +13,11 @@ function initAuth() {
   auth.signInAnonymously().catch(err => console.error('Auth error:', err));
 }
 
-function handleLogin() {
+// handleLogin - מקבל event כדי לתמוך ב-form onsubmit
+function handleLogin(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  setState({ loginError: '' });
+
   const username = AppState.loginUsername.trim();
   const password = AppState.loginPassword.trim();
 
@@ -42,6 +46,10 @@ function handleLogin() {
 }
 
 function handleLogout() {
-  setState({ isAuthenticated: false, loggedInAdmin: '', loginUsername: '', loginPassword: '' });
+  setState({
+    isAuthenticated: false, loggedInAdmin: '',
+    loginUsername: '', loginPassword: '',
+    loginError: ''
+  });
   renderApp();
 }
