@@ -1,0 +1,126 @@
+// ===== ui-soldiers.js =====
+// טאב ניהול חיילים
+
+function renderSoldiersTab() {
+  const { soldiersData, isSavingSoldiers, soldierSaveMessage, newSoldier } = AppState;
+
+  return `
+  <div class="space-y-6">
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h2 class="text-lg font-bold text-slate-700">ניהול רשימת החיילים</h2>
+        <p class="text-sm text-slate-500">ערוך, הוסף או הסר חיילים מהרשימה. לאחר עריכה לחץ על "שמור שינויים" כדי לסנכרן עם Firebase.</p>
+      </div>
+      <button onclick="handleSaveSoldiers()"
+        ${isSavingSoldiers ? 'disabled' : ''}
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-colors disabled:bg-slate-300 w-full sm:w-auto">
+        ${isSavingSoldiers ? 'שומר...' : `שמור שינויים <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>`}
+      </button>
+    </div>
+
+    ${soldierSaveMessage ? `<div class="bg-green-100 text-green-700 p-4 rounded-lg font-medium shadow-sm">${escH(soldierSaveMessage)}</div>` : ''}
+
+    <!-- Add new soldier form -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+      <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        הוספת חייל חדש
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">שם מלא</label>
+          <input id="new-soldier-name" required placeholder="שם החייל"
+            oninput="setState({newSoldier:{...AppState.newSoldier,name:this.value}})"
+            class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">מספר אישי</label>
+          <input id="new-soldier-id" required placeholder="מספר אישי"
+            oninput="setState({newSoldier:{...AppState.newSoldier,id:this.value}})"
+            class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">מחלקה</label>
+          <input id="new-soldier-dept" placeholder="ללא מחלקה"
+            oninput="setState({newSoldier:{...AppState.newSoldier,department:this.value}})"
+            class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"/>
+        </div>
+        <button onclick="submitNewSoldier()"
+          class="bg-slate-800 hover:bg-slate-900 text-white rounded-lg p-2 font-bold transition-colors">
+          הוסף חייל
+        </button>
+      </div>
+      <label class="flex items-center gap-2 mt-3 cursor-pointer">
+        <input id="new-soldier-maplag" type="checkbox"
+          onchange="setState({newSoldier:{...AppState.newSoldier,isMaplag:this.checked}})"
+          class="w-4 h-4 text-blue-600 rounded cursor-pointer"/>
+        <span class="text-sm font-medium text-slate-700">הרשאת מפל"ג (יוכל להתחבר לניהול)</span>
+      </label>
+    </div>
+
+    <!-- Soldiers table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-600 text-sm">
+              <th class="p-3 border-b border-slate-200">שם החייל</th>
+              <th class="p-3 border-b border-slate-200">מספר אישי</th>
+              <th class="p-3 border-b border-slate-200">מחלקה</th>
+              <th class="p-3 border-b border-slate-200 text-center">הרשאת מפל"ג</th>
+              <th class="p-3 border-b border-slate-200 text-center w-16">הסרה</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${soldiersData.map((soldier, idx) => `
+            <tr class="border-b border-slate-50 hover:bg-slate-50">
+              <td class="p-2">
+                <input value="${escH(soldier.name)}"
+                  onchange="handleUpdateSoldier(${idx},'name',this.value)"
+                  class="w-full border-none bg-transparent p-1 outline-none focus:bg-white focus:ring-1 focus:ring-blue-300 rounded"/>
+              </td>
+              <td class="p-2">
+                <input value="${escH(soldier.id || '')}"
+                  onchange="handleUpdateSoldier(${idx},'id',this.value)"
+                  class="w-full border-none bg-transparent p-1 outline-none focus:bg-white focus:ring-1 focus:ring-blue-300 rounded font-mono text-sm"/>
+              </td>
+              <td class="p-2">
+                <input value="${escH(soldier.department || '')}"
+                  placeholder="ללא מחלקה"
+                  onchange="handleUpdateSoldier(${idx},'department',this.value)"
+                  class="w-full border-none bg-transparent p-1 outline-none focus:bg-white focus:ring-1 focus:ring-blue-300 rounded"/>
+              </td>
+              <td class="p-2 text-center">
+                <input type="checkbox" ${soldier.isMaplag ? 'checked' : ''}
+                  onchange="handleUpdateSoldier(${idx},'isMaplag',this.checked)"
+                  class="w-4 h-4 text-blue-600 rounded cursor-pointer"/>
+              </td>
+              <td class="p-2 text-center">
+                <button onclick="handleRemoveSoldier(${idx})" title="הסר חייל"
+                  class="text-red-500 hover:text-red-700 p-1 bg-white rounded shadow-sm border border-red-100">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function submitNewSoldier() {
+  const { newSoldier } = AppState;
+  if (!newSoldier.name || !newSoldier.id) return;
+  setState({
+    soldiersData: [...AppState.soldiersData, { ...newSoldier }],
+    newSoldier: { name: '', id: '', department: '', isMaplag: false }
+  });
+  ['new-soldier-name','new-soldier-id','new-soldier-dept'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const cb = document.getElementById('new-soldier-maplag');
+  if (cb) cb.checked = false;
+  renderApp();
+}
