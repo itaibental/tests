@@ -21,47 +21,57 @@ function renderFormTab() {
     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
       <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2 mb-4">
         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        בחר חייל
+        בחר חייל להצגה ועדכון ציוד
       </h2>
-      <div class="relative">
-        <input
-          type="text"
-          id="form-soldier-search"
-          value="${escH(formSearchTerm)}"
-          placeholder="הקלד שם או מספר אישי..."
-          autocomplete="off"
-          class="w-full border border-slate-300 rounded-lg p-2.5 pr-10 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          oninput="onFormSearch(this.value)"
-          onfocus="setState({isFormDropdownOpen:true});renderApp()"
-          onblur="setTimeout(()=>{setState({isFormDropdownOpen:false});renderApp()},200)"
-        />
-        <svg class="w-5 h-5 text-slate-400 absolute right-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        ${isFormDropdownOpen ? `
-        <ul class="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-          ${filtered.length > 0 ? filtered.map((s, i) =>
-            `<li onmousedown="selectSoldierForForm(AppState.soldiersData[${AppState.soldiersData.indexOf(s)}])"
-                class="p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 text-slate-700">
-              ${escH(s.name)} <span class="text-slate-400 text-sm">${s.id ? `- ${s.id}` : ''} ${s.department ? `| ${s.department}` : ''}</span>
-            </li>`).join('') :
-            `<li class="p-3 text-slate-500 text-sm text-center">לא נמצאו חיילים</li>`
-          }
-        </ul>` : ''}
+
+      <!-- Two columns: name search + personal number display -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- Column right: soldier name search -->
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">חיפוש חייל (שם או מ.א.)</label>
+          <div class="relative">
+            <input
+              type="text"
+              id="form-soldier-search"
+              value="${escH(formSearchTerm)}"
+              placeholder="הקלד לחיפוש חייל..."
+              autocomplete="off"
+              class="w-full border border-slate-300 rounded-lg p-2.5 pr-10 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              oninput="onFormSearch(this.value)"
+              onfocus="setState({isFormDropdownOpen:true});renderApp()"
+              onblur="setTimeout(()=>{setState({isFormDropdownOpen:false});renderApp()},200)"
+            />
+            <svg class="w-5 h-5 text-slate-400 absolute right-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            ${isFormDropdownOpen ? `
+            <ul class="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+              ${filtered.length > 0 ? filtered.map(s =>
+                `<li onmousedown="selectSoldierForForm(AppState.soldiersData[${AppState.soldiersData.indexOf(s)}])"
+                    class="p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 text-slate-700">
+                  ${escH(s.name)} <span class="text-slate-400 text-sm">${s.id ? `- ${s.id}` : ''} ${s.department ? `| ${s.department}` : ''}</span>
+                </li>`).join('') :
+                `<li class="p-3 text-slate-500 text-sm text-center">לא נמצאו חיילים</li>`
+              }
+            </ul>` : ''}
+          </div>
+        </div>
+
+        <!-- Column left: personal number (auto-filled) -->
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1">מספר אישי מקושר</label>
+          <input
+            type="text"
+            readonly
+            value="${escH(AppState.personalNumber)}"
+            placeholder="מספר אישי יופיע כאן אוטומטית"
+            class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-slate-500 outline-none cursor-default font-mono"
+          />
+        </div>
+
       </div>
-      ${soldierName ? `<div class="mt-3 bg-blue-50 text-blue-800 px-4 py-2 rounded-lg font-bold text-sm">חייל נבחר: ${escH(soldierName)}</div>` : ''}
     </div>
 
     ${soldierName ? `
-    <!-- Cart summary header -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-0">
-      <div>
-        <h2 class="text-lg font-bold text-slate-700">הציוד של החייל (ניתן לעדכן כמויות ולשמור)</h2>
-        <p class="text-sm text-slate-500">הוסף למשיכה חדשה, או הפחת כדי לסמן החזרת ציוד.</p>
-      </div>
-      <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-bold flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-        סה"כ: ${totalItems} פריטים
-      </div>
-    </div>
 
     <!-- Inventory categories -->
     ${Object.entries(inventoryCategories).map(([catName, items]) => `
@@ -119,11 +129,21 @@ function renderFormTab() {
     ${submitMessage ? `<div class="bg-green-100 text-green-700 p-4 rounded-lg font-bold text-center shadow-sm">${escH(submitMessage)}</div>` : ''}
     <div class="sticky bottom-4 mt-6">
       <button onclick="handleSubmitForm()"
-        ${isSubmitting ? 'disabled' : ''}
-        class="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all ${isSubmitting ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-xl hover:-translate-y-1'}">
+        ${isSubmitting || !soldierName ? 'disabled' : ''}
+        class="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all ${isSubmitting || !soldierName ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-slate-500 hover:bg-green-600 text-white hover:shadow-xl'}">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
         ${isSubmitting ? 'מעדכן נתונים...' : 'שמור שינויים בציוד החייל'}
-        ${!isSubmitting ? `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>` : ''}
       </button>
+    </div>
+
+    <!-- Inventory categories label below button -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mt-2">
+      <h2 class="text-lg font-bold text-slate-700">הציוד של החייל (ניתן לעדכן כמויות ולשמור)</h2>
+      <p class="text-sm text-slate-500 mt-1">הוסף למשיכה חדשה, או הפחת כדי לסמן החזרת ציוד.
+        <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-bold mr-3">
+          סה"כ: ${totalItems} פריטים
+        </span>
+      </p>
     </div>` : `
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center text-slate-400">
       <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -146,34 +166,36 @@ function renderEquipmentSection(title, colorClass, data, selType, selSerial, car
       <svg class="w-5 h-5 ${colorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconMap[title] || ''}</svg>
       ${title}
     </h2>
-    <div class="flex flex-col md:flex-row gap-4 items-end mb-4">
-      <div class="w-full md:w-1/3">
-        <label class="block text-sm font-medium text-slate-700 mb-1">הוסף ${title} (סוג)</label>
+
+    <!-- Two selects side by side -->
+    <div class="grid grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">הוסף ${title} חדש (סוג)</label>
         <select onchange="${setTypeFn}(this.value)"
-          class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-700">
           <option value="" ${!selType ? 'selected' : ''} disabled>בחר סוג...</option>
           ${Object.keys(data).map(t => `<option value="${escH(t)}" ${selType === t ? 'selected' : ''}>${escH(t)}</option>`).join('')}
         </select>
       </div>
-      <div class="w-full md:w-1/3">
-        <label class="block text-sm font-medium text-slate-700 mb-1">מספר סידורי</label>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">מספר ${title === 'נשק' ? 'נשק' : 'סידורי'}</label>
         <select onchange="${setSerialFn}(this.value)"
           ${!selType ? 'disabled' : ''}
-          class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-slate-100 disabled:text-slate-400">
+          class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-slate-100 disabled:text-slate-400 text-slate-700">
           <option value="" ${!selSerial ? 'selected' : ''} disabled>בחר מספר...</option>
           ${selType ? (data[selType] || []).filter(s => s.trim() !== '').map(s =>
             `<option value="${escH(s)}" ${selSerial === s ? 'selected' : ''}>${escH(s)}</option>`
           ).join('') : ''}
         </select>
       </div>
-      <div class="w-full md:w-1/3">
-        <button onclick="${addFn}()"
-          ${!selType || !selSerial ? 'disabled' : ''}
-          class="w-full bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 disabled:text-slate-500 text-white p-2.5 rounded-lg font-bold transition-colors">
-          הוסף לחייל
-        </button>
-      </div>
     </div>
+
+    <!-- Full-width add button -->
+    <button onclick="${addFn}()"
+      ${!selType || !selSerial ? 'disabled' : ''}
+      class="w-full bg-slate-400 hover:bg-slate-600 disabled:bg-slate-200 disabled:text-slate-400 text-white p-2.5 rounded-lg font-bold transition-colors mb-4">
+      הוסף לחייל
+    </button>
 
     ${cartItems.length > 0 ? `
     <div class="border-t border-slate-100 pt-4">
